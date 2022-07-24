@@ -3,6 +3,7 @@ package br.com.dicasdeumdev.api.services.impl;
 import br.com.dicasdeumdev.api.domain.User;
 import br.com.dicasdeumdev.api.domain.dto.UserDTO;
 import br.com.dicasdeumdev.api.repositories.UserRepositoy;
+import br.com.dicasdeumdev.api.services.excepyions.DataIntergratyViolationException;
 import br.com.dicasdeumdev.api.services.excepyions.ObjectNotFoundexception;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,8 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 @SpringBootTest
@@ -105,7 +105,21 @@ class UserServiceImplTest {
         assertEquals(NAME, user.getName());
         assertEquals(EMAIL, user.getEmail());
         assertEquals(PASSWORD, user.getPassword());
-        
+
+    }
+
+    @Test
+    void whenCreateThenreturnAnDataIntegrityViolationException() {
+        when(repositoy.findByEmail(anyString())).thenReturn(optionalUser);
+        try {
+            optionalUser.get().setId(2);
+            service.create(userDTO);
+        }catch (Exception ex){
+            assertEquals(DataIntergratyViolationException.class, ex.getClass());
+            assertEquals("E-mail já existe em nossa base de dados", ex.getMessage());
+        }
+
+
     }
 
     @Test
