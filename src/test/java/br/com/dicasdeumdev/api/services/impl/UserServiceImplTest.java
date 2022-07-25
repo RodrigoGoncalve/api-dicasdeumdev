@@ -105,7 +105,6 @@ class UserServiceImplTest {
         assertEquals(NAME, user.getName());
         assertEquals(EMAIL, user.getEmail());
         assertEquals(PASSWORD, user.getPassword());
-
     }
 
     @Test
@@ -119,11 +118,20 @@ class UserServiceImplTest {
             assertEquals("E-mail já existe em nossa base de dados", ex.getMessage());
         }
 
-
     }
 
     @Test
-    void update() {
+    void whenUpdateThenreturnSuccesso() {
+        when(repositoy.save(any())).thenReturn(user);
+
+        User user = service.update(userDTO);
+
+        assertNotNull(user);
+        assertEquals(User.class,user.getClass());
+        assertEquals(ID, user.getId());
+        assertEquals(NAME, user.getName());
+        assertEquals(EMAIL, user.getEmail());
+        assertEquals(PASSWORD, user.getPassword());
     }
 
     @Test
