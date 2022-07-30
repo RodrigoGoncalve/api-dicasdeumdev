@@ -11,12 +11,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockHttpServletRequest;
 
+import java.time.LocalDateTime;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class ResourceExceptionHandlerTest {
 
     public static final String OBJETO_NAO_ENCONTRADO = "Objeto não encontrado";
+    public static final String E_MAIL_JA_EXISTE_EM_NOSSA_BASE_DE_DADOS = "E-mail já existe em nossa base de dados";
     @InjectMocks
     private ResourceExceptionHandler exceptionHandler;
 
@@ -38,13 +41,15 @@ class ResourceExceptionHandlerTest {
         assertEquals(StanderError.class, response.getBody().getClass());
         assertEquals(OBJETO_NAO_ENCONTRADO, response.getBody().getError());
         assertEquals(404, response.getBody().getStatus());
+        assertNotEquals("/user/2", response.getBody().getPath());
+        assertNotEquals(LocalDateTime.now(), response.getBody().getTimestamp());
     }
 
     @Test
-    void whenDatIntegratyViolationExceptionThenReturnResponseEntity() {
+    void whenDatIntegrityViolationExceptionThenReturnResponseEntity() {
         ResponseEntity<StanderError> response = exceptionHandler
-                .datIntegratyViolationException(
-                        new DataIntergratyViolationException("E-mail já existe em nossa base de dados"),
+                .datIntegrityViolationException(
+                        new DataIntergratyViolationException(E_MAIL_JA_EXISTE_EM_NOSSA_BASE_DE_DADOS),
                         new MockHttpServletRequest()
                 );
 
@@ -53,8 +58,7 @@ class ResourceExceptionHandlerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
         assertEquals(ResponseEntity.class, response.getClass());
         assertEquals(StanderError.class, response.getBody().getClass());
-        assertEquals("E-mail já existe em nossa base de dados", response.getBody().getError());
+        assertEquals(E_MAIL_JA_EXISTE_EM_NOSSA_BASE_DE_DADOS, response.getBody().getError());
         assertEquals(400, response.getBody().getStatus());
-
     }
 }
